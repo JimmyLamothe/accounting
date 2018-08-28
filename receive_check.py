@@ -1,3 +1,5 @@
+#!/usr/bin/env python3 
+
 import sys
 from itertools import combinations
 from oauth2client.service_account import ServiceAccountCredentials
@@ -63,7 +65,7 @@ for index, bool in enumerate(paid_bools):
         else:
             value_dict[company_name].append((amount, row))
         print(row, company_name, amount)
-        print_description(row)
+        #print_description(row)
 
 print (value_dict)
 # json_dump(value_dict, 'json/test_check.json') #Uncomment to create test dictionary.
@@ -110,7 +112,7 @@ def pay_invoice(row):
     print('Value: ' + get_range('F' + row)['values'][0][0] + '\n')
 
 def manual_payment(row):    
-    print(return_description(row))
+    print_description(row)
     confirm = input("Press Y to pay this invoice, anything else to exit")
     if str.upper(confirm) == "Y":
         pay_invoice(row)

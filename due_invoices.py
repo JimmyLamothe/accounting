@@ -10,7 +10,8 @@ from utilities import value_changes, get_final_row, json_load, json_dump, dollar
 Lists unpaid invoices by company.
 
 Required Arguments: None.
-Optional Arguments: "add_wip" to add an item to work in progress..
+Optional Arguments: "add_wip" to add an item to work in progress.
+                    "list_wip" to see and-or remove work in progress 
 """
 #company_dict = json_load('json/company_dict.json')
 #for company in company_dict:
@@ -27,6 +28,22 @@ try:
         print('Current work in progress:\n')
         for index, item in enumerate(work_in_progress):
             print(str(index + 1) + '. ' + item)
+        json_dump(work_in_progress, 'json/work_in_progress.json')
+        sys.exit(0)
+    elif wip_input == 'list_wip':
+        print('Current work in progress:\n')
+        for index, item in enumerate(work_in_progress):
+            print(str(index + 1) + '. ' + item)
+        index = input('Do you want to invoice an item now?' + '\n' +
+                  'If so, please type the corresponding number to delete from list' +
+                  ' and run new_invoice.py\n' +
+                  'Use argument add_wip to add work in progress\n')
+        if index:
+            try:
+                del work_in_progress[int(index) - 1]
+                json_dump(work_in_progress, 'json/work_in_progress.json')
+            except IndexError:
+                print('Incorrect input. Rerun program to try again.')
         json_dump(work_in_progress, 'json/work_in_progress.json')
         sys.exit(0)
 except IndexError:

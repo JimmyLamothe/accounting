@@ -20,6 +20,8 @@ Optional Arguments: Use paramater 'test' to keep dicts unchanged in Dropbox whil
 All  necessary information for invoicing is input at runtime.
 """
 
+translation_reminder = False #Used to remind me to check the final translated text 
+
 local = False  #Change to False to complete entire process including Google Docs changes, to True to stop before.
 
 dropbox = True #Change to False by adding 'test' as an argument to keep dicts intact in Dropbox.
@@ -229,6 +231,8 @@ unit_quan = float(input('Combien de ' + active_rate.dict['type'] + '(s) voulez-v
 desc_cost = active_rate.rate_sentence(unit_quan)
 unit_cost = active_rate.dict['unit_cost']
 prof_type = active_rate.dict['profession']
+if prof_type == 'TRAD':
+    translation_reminder = True
 
 """
 print(type(invoice_number))
@@ -362,7 +366,8 @@ if dropbox:
 else:
     print('\nTest mode enabled, dicts not saved to Dropbox.')
 
-
+if translation_reminder:
+    print("Don't forget final check")
 
 
 
