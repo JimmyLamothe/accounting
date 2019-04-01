@@ -103,6 +103,9 @@ def get_project():
 
     if project_input is "0": # Create new project entry in project_dict.json and return the object
         name = input('Entrez le nom du projet\n')
+        if name in project_dict.keys():
+            print('Name already exists, please pick another')
+            return get_project()
         code = input('Entrez un code de facturation pour la comptabilité générale. Ex: AVRP - CHUCK\n')
         invoice = input('Entrez le nom de facturation ou laissez blanc pour mettre le nom de compagnie. \n')
         return active_company.add_project(name, invoice, code)
