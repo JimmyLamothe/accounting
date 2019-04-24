@@ -1,20 +1,29 @@
 #MORE INFO: https://developers.google.com/resources/api-libraries/documentation/sheets/v4/python/latest/
 #MORE INFO: https://developers.google.com/sheets/quickstart/python
+#INSTALLATION: https://developers.google.com/api-client-library/python/start/installation
 
-import httplib2
 import os
 import io
-from apiclient.http import MediaIoBaseUpload, MediaIoBaseDownload
-from apiclient.http import MediaFileUpload
-from apiclient import discovery
-from apiclient import errors
+import pickle
+import os.path
+"""from apiclient.http import MediaIoBaseUpload, MediaIoBaseDownload #CONFIRM?
+from apiclient.http import MediaFileUpload #CONFIRM?
+from apiclient import discovery #CONFIRM?
+from apiclient import errors #CONFIRM?
+"""
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+
+"""
 import oauth2client
 from oauth2client import client
 from oauth2client import tools
-
+from oauth2client import file
+"""
 
 SCOPES = 'https://www.googleapis.com/auth/drive'
-CLIENT_SECRET_FILE = '/json/client_secret.json'
+CLIENT_SECRET_FILE = 'json/client_secret.json'
 APPLICATION_NAME = 'Drive API Python Quickstart'
 
 # Standard Credential Procedure
@@ -23,35 +32,35 @@ def get_credentials():
     """Gets valid user credentials from storage.
 
     If nothing has been stored, or if the stored credentials are invalid,
-    the OAuth2 flow is completed to obtain the new credentials.
+    obtains the new credentials.
 
     Returns:
-        Credentials, the obtained credential.
+        creds, the obtained credential.
     """
-    home_dir = os.path.expanduser('~')
-    credential_dir = os.path.join(home_dir, '.credentials')
-    if not os.path.exists(credential_dir):
-        os.makedirs(credential_dir)
-    credential_path = os.path.join(credential_dir,
-                                   'drive-python-quickstart.json')
-
-    store = oauth2client.file.Storage(credential_path)
-    credentials = store.get()
-    if not credentials or credentials.invalid:
-        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
-        flow.user_agent = APPLICATION_NAME
-        if flags:
-            credentials = tools.run_flow(flow, store, flags)
-        else: # Needed only for compatibility with Python 2.6
-            credentials = tools.run(flow, store)
-        print('Storing credentials to ' + credential_path)
-    return credentials
+    creds = None
+    # The file token.pickle stores the user's access and refresh tokens, and is
+    # created automatically when the authorization flow completes for the first
+    # time.
+    if os.path.exists('auth/token.pickle'):
+        with open('auth/token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+    # If there are no (valid) credentials available, let the user log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'auth/credentials.json', SCOPES)
+            creds = flow.run_local_server()
+        # Save the credentials for the next run
+        with open('auth/token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+    return creds
 
 #RETURNS: Google Drive Service instance
 def create_drive_service():
-    credentials = get_credentials()
-    http = credentials.authorize(httplib2.Http())
-    service = discovery.build('drive', 'v3', http=http)
+    creds = get_credentials()
+    service = build('drive', 'v3', credentials=creds)
     return service
 
 #RETURNS: Google Sheets Service instance - USE FOR EVERYTHING
@@ -59,12 +68,8 @@ def create_drive_service():
 #MORE INFO: https://developers.google.com/sheets/quickstart/python
 
 def create_sheet_service():
-    credentials = get_credentials()
-    http = credentials.authorize(httplib2.Http())
-    discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
-                    'version=v4')
-    service = discovery.build('sheets', 'v4', http=http,
-                              discoveryServiceUrl=discoveryUrl)
+    creds = get_credentials()
+    service = build('sheets', 'v4', credentials=creds)
     return service
 
 #Return range from sheet

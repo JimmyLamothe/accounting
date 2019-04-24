@@ -2,7 +2,6 @@
 
 import sys
 from itertools import combinations
-from oauth2client.service_account import ServiceAccountCredentials
 from google_methods import update_spreadsheet, get_range, set_range, get_file_id
 from utilities import value_changes, get_final_row, json_load, json_dump, dollar_to_float
 

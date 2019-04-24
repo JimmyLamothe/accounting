@@ -2,7 +2,6 @@
 
 import sys
 import datetime
-from oauth2client.service_account import ServiceAccountCredentials
 from google_methods import copy_file, download_pdf, update_spreadsheet, get_range, set_range
 from utilities import title_change, value_changes, json_load, json_dump, get_month, insert_row, get_date_string
 from utilities import dollar_to_float, dropbox_backup, get_final_row, check_invoice_number
@@ -20,9 +19,7 @@ Optional Arguments: Use paramater 'test' to keep dicts unchanged in Dropbox whil
 All  necessary information for invoicing is input at runtime.
 """
 
-translation_reminder = False #Used to remind me to check the final translated text 
-
-local = False  #Change to False to complete entire process including Google Docs changes, to True to stop before.
+local = False  #Change to False to complete entire process including Google Docs changes, to True to stop before. Also bypasses Dropbox backup.
 
 dropbox = True #Change to False by adding 'test' as an argument to keep dicts intact in Dropbox.
 
@@ -345,12 +342,6 @@ new_values = [[title, date_string, base_salary, tax_federal, tax_provincial, tot
 
 set_range(new_range, new_values)
 
-
-
-
-
-
-
 #download PDF
 
 download_pdf(new_id, '/Users/jimmy/Documents/Factures/' + title)
@@ -368,41 +359,3 @@ if dropbox:
     print('\nAll dicts backed up to Dropbox.')
 else:
     print('\nTest mode enabled, dicts not saved to Dropbox.')
-
-if translation_reminder:
-    print("Don't forget final check")
-
-
-
-
-
-
-
-
-
-
-
-
-#UNUSED - Gspread former procedure - email send
-"""
-#gspread standard login procedure
-scope = ['https://spreadsheets.google.com/feeds']
-
-credentials = ServiceAccountCredentials.from_json_keyfile_name('accounting_secret/client_secret.json', scope)
-
-gc = gspread.authorize(credentials)
-
-print(new_id)
-
-for spreadsheet in gc.openall():
-    print (spreadsheet.sheet1)
-# sheet = gc.open_by_key(new_id)
-
-# new_invoice = sheet.worksheet("Sheet1")
-
-# print(new_invoice)
-"""
-
-
-
-
