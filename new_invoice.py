@@ -5,6 +5,7 @@ import datetime
 from google_methods import copy_file, download_pdf, update_spreadsheet, get_range, set_range
 from utilities import title_change, value_changes, json_load, json_dump, get_month, insert_row, get_date_string
 from utilities import dollar_to_float, dropbox_backup, get_final_row, check_invoice_number
+from utilities import backup_dicts
 import invoice_info
 
 """
@@ -109,7 +110,7 @@ def get_project():
     else: 
         try: # Create existing project object from project_dict.json and return it
             int(project_input)
-            return invoice_info.Project(active_company.dict['company_name'], order_list[project_input], invoice_code = '') 
+            return invoice_info.Project(active_company.dict['company_name'], order_list[project_input], invoice_code = '')
         except (ValueError, KeyError):
             print('Entrée invalide, recommencez SVP.\n')
             return get_project() #Recursively call function until proper input is received
@@ -359,3 +360,6 @@ if dropbox:
     print('\nAll dicts backed up to Dropbox.')
 else:
     print('\nTest mode enabled, dicts not saved to Dropbox.')
+
+#Backup all dicts to directory with date and time - Keep all versions for now
+backup_dicts()

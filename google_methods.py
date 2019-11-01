@@ -6,11 +6,11 @@ import os
 import io
 import pickle
 import os.path
-"""from apiclient.http import MediaIoBaseUpload, MediaIoBaseDownload #CONFIRM?
-from apiclient.http import MediaFileUpload #CONFIRM?
-from apiclient import discovery #CONFIRM?
-from apiclient import errors #CONFIRM?
-"""
+from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload #CONFIRM?
+from googleapiclient.http import MediaFileUpload #CONFIRM?
+from googleapiclient import discovery #CONFIRM?
+from googleapiclient import errors #CONFIRM?
+
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request

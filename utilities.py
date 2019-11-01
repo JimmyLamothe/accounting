@@ -2,8 +2,8 @@
 #MORE INFO: https://developers.google.com/sheets/quickstart/python
 
 import sys, os
-import json
 import datetime
+import json
 from google_methods import update_spreadsheet, spreadsheet_info, create_sheet_service, get_range, get_file_id
 
 """
@@ -26,6 +26,9 @@ Unit Cost: 38.4
 
 """
 
+
+
+
 # write to json
 def json_dump(input, file_name):
     with open(file_name, 'w') as json_file:
@@ -34,6 +37,90 @@ def json_dump(input, file_name):
 def json_load(file_name):
     with open(file_name, 'r') as json_file:
         return(json.load(json_file))
+
+#Backup procedure - creates bkup directory and backups all files with date
+def backup(filepath):                                                             
+    def get_root(filepath):
+        index = filepath.rfind('/')
+        root = filepath[0:index + 1]
+        return root
+    def get_filename(filepath):
+        index = filepath.rfind('/')
+        dot = filepath.rfind('.')
+        filename = filepath[index + 1:dot]
+        return filename
+    def get_extension(filepath):
+        dot = filepath.rfind('.')
+        extension = filepath[dot:]
+        return extension
+    root = get_root(filepath)
+    filename = get_filename(filepath)
+    extension = get_extension(filepath)
+    new_root = root + 'bkup/'
+    def get_date():
+        time = datetime.datetime.today()
+        year = str(time.year)
+        def add_zero(string):
+            if len(string) == 1:
+                return '0' + string
+            elif len(string) == 2:
+                return string
+            else:
+                raise ValueError
+        month = add_zero(str(time.month))
+        day = add_zero(str(time.day))
+        hour = add_zero(str(time.hour))
+        minute = add_zero(str(time.minute))
+        return year + month + day + hour + minute
+    new_filename = filename + '_' + get_date()
+    new_filepath = new_root + new_filename + extension
+    def write_file():
+        with open(filepath, 'r') as source:
+            with open (new_filepath, 'w') as target:
+                target.write(source.read())
+    try:
+        write_file()
+    except FileNotFoundError:
+        os.mkdir(new_root)
+        write_file()
+
+def backup_dicts():
+    backup('json/company_dict.json')
+    backup('json/project_dict.json')
+    backup('json/rate_dict.json')
+    backup('json/invoice_number.json')
+
+#Backup all json dicts to dropbox
+#ARGS: None
+#RETURNS: None
+def dropbox_backup():
+    company_dict = json_load('json/company_dict.json')
+    project_dict = json_load('json/project_dict.json')
+    rate_dict = json_load('json/rate_dict.json')
+    invoice_number = json_load('json/invoice_number.json')
+
+    json_dump(company_dict, '/Users/jimmy/Dropbox/Accounting_Backup/company_dict.json')
+    json_dump(project_dict, '/Users/jimmy/Dropbox/Accounting_Backup/project_dict.json')
+    json_dump(rate_dict, '/Users/jimmy/Dropbox/Accounting_Backup/rate_dict.json')
+    json_dump(invoice_number, '/Users/jimmy/Dropbox/Accounting_Backup/invoice_number.json')
+
+#Restores all json dicts from dropbox
+#ARGS: None
+#RETURNS: None
+def dropbox_restore():
+    if input('Type "y" to confirm you want to restore all dicts from Dropbox backup.\n') not in ('y'):
+        sys.exit(0)
+    company_dict = json_load('/Users/jimmy/Dropbox/Accounting_Backup/company_dict.json')
+    project_dict = json_load('/Users/jimmy/Dropbox/Accounting_Backup/project_dict.json')
+    rate_dict = json_load('/Users/jimmy/Dropbox/Accounting_Backup/rate_dict.json')
+    invoice_number = json_load('/Users/jimmy/Dropbox/Accounting_Backup/invoice_number.json')
+
+    json_dump(company_dict, 'json/company_dict.json')
+    json_dump(project_dict, 'json/project_dict.json')
+    json_dump(rate_dict, 'json/rate_dict.json')
+    json_dump(invoice_number, 'json/invoice_number.json')
+
+    print('\nAll dicts restored from Dropbox Backup')
 
 def print_sheet_info(spreadsheet_id):
     output = ''
@@ -172,38 +259,6 @@ def dollar_to_float(raw_dollar_string):
     #print(number)
     #print(type(number))
     return number
-
-#Backup all json dicts to dropbox
-#ARGS: None
-#RETURNS: None
-def dropbox_backup():
-    company_dict = json_load('json/company_dict.json')
-    project_dict = json_load('json/project_dict.json')
-    rate_dict = json_load('json/rate_dict.json')
-    invoice_number = json_load('json/invoice_number.json')
-
-    json_dump(company_dict, '/Users/jimmy/Dropbox/Accounting_Backup/company_dict.json')
-    json_dump(project_dict, '/Users/jimmy/Dropbox/Accounting_Backup/project_dict.json')
-    json_dump(rate_dict, '/Users/jimmy/Dropbox/Accounting_Backup/rate_dict.json')
-    json_dump(invoice_number, '/Users/jimmy/Dropbox/Accounting_Backup/invoice_number.json')
-
-#Restores all json dicts from dropbox
-#ARGS: None
-#RETURNS: None
-def dropbox_restore():
-    if input('Type "y" to confirm you want to restore all dicts from Dropbox backup.\n') not in ('y'):
-        sys.exit(0)
-    company_dict = json_load('/Users/jimmy/Dropbox/Accounting_Backup/company_dict.json')
-    project_dict = json_load('/Users/jimmy/Dropbox/Accounting_Backup/project_dict.json')
-    rate_dict = json_load('/Users/jimmy/Dropbox/Accounting_Backup/rate_dict.json')
-    invoice_number = json_load('/Users/jimmy/Dropbox/Accounting_Backup/invoice_number.json')
-
-    json_dump(company_dict, 'json/company_dict.json')
-    json_dump(project_dict, 'json/project_dict.json')
-    json_dump(rate_dict, 'json/rate_dict.json')
-    json_dump(invoice_number, 'json/invoice_number.json')
-
-    print('\nAll dicts restored from Dropbox Backup')
 
 
 

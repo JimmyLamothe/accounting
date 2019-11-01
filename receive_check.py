@@ -54,16 +54,24 @@ def print_description(row):
 for index, bool in enumerate(paid_bools):
     if not bool_dict[bool[0]]:
         row = str(index + 4)
-        company = get_range('A' + row)['values'][0][0]
-        underline_index = company.index('_')
-        company_name = company[:underline_index]
+        #company = get_range('A' + row)['values'][0][0] #TESTING PROJECT INSTEAD OF COMPANY
+        #underline_index = company.index('_')
+        #company_name = company[:underline_index]
+        project = get_range('I' + row)['values'][0][0]
         amount_raw = get_range('F' + row)['values'][0][0]
         amount = dollar_to_float(amount_raw)
+        """
         if company_name not in value_dict:
             value_dict[company_name] = [(amount, row)]
         else:
             value_dict[company_name].append((amount, row))
-        print(row, company_name, amount)
+        """
+        if project not in value_dict:
+            value_dict[project] = [(amount, row)]
+        else:
+            value_dict[project].append((amount, row))
+        #print(row, company_name, amount)
+        print(row, project, amount)
         #print_description(row)
 
 print (value_dict)
@@ -78,9 +86,12 @@ check_float = float(check_string)
 
 def get_combinations(value_dictionary):
     possibilities = []
-    for company in value_dict:
-        print(company)
-        length = len(value_dict[company])
+    #for company in value_dict:
+    for project in value_dict:
+        #print(company)
+        print(project)
+        #length = len(value_dict[company])
+        length = len(value_dict[project])
         enumerate_length = ''
         for i in range (length):
             enumerate_length += str(i) #Create string in format '01234...' to use as index.
@@ -89,13 +100,15 @@ def get_combinations(value_dictionary):
             for combination in combinator:
                 total = 0
                 for index in combination:
-                    total += value_dict[company][int(index)][0]
+                    #total += value_dict[company][int(index)][0]
+                    total += value_dict[project][int(index)][0]
                 if round(total, 2) == check_float:
                     print(round(total,2))
                     print(combination)
                     combination_list = []
                     for index in combination:
-                        combination_list.append(value_dict[company][int(index)][1]) #append row
+                        #combination_list.append(value_dict[company][int(index)][1]) #append row
+                        combination_list.append(value_dict[project][int(index)][1]) #append row
                     possibilities.append(combination_list)
     return possibilities
 
@@ -145,7 +158,3 @@ else:
 json_dump(last_change_list, 'json/last_change_list.json')
 
 input("Don't forget to deposit check if necessary. Press RETURN to confirm.")
-
-
-
-
