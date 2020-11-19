@@ -143,8 +143,10 @@ def get_rate(project):
             int(dollar_rate)
         except (ValueError):
             try:
+                dollar_rate = dollar_rate.replace(',','.')
                 float(dollar_rate)
                 float_bool = True
+                dollar_rate = str(float(dollar_rate))
             except (ValueError):
                 print('Entrée invalide. Veuillez recommencer.')
                 return get_rate(project)

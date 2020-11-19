@@ -115,13 +115,6 @@ class Rate:
             self.dict['type'] = input('Entrez le type d\'unité. Ex: Forfait, journée, mot...\n').lower()
             self.dict['milieu'] = ' à '
             self.dict['taux'] = str(self.dict['unit_cost']) + '$'
-            try:
-                dot_index = self.dict['taux'].index('.')
-            except(ValueError):
-                dot_index = -1
-            if not dot_index == -1:
-                temp = self.dict['taux']
-                self.dict['taux'] = temp[0:dot_index] + ',' + temp[dot_index + 1:]
             self.dict['fin'] = ' ' + input('Tapez la fin désirée. Ex: par animatique de 27 minutes.\n')
             rate_dict[project_name + '_' + dollar_rate] = self.dict
             json_dump(rate_dict, 'json/rate_dict.json') #Updates the rate JSON file.
