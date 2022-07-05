@@ -5,6 +5,7 @@
 import os
 import io
 import pickle
+import datetime
 import os.path
 from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload #CONFIRM?
 from googleapiclient.http import MediaFileUpload #CONFIRM?
@@ -77,7 +78,10 @@ def create_sheet_service():
 #RETURNS: range object (dictionary with values noted in list stored in 'values' key).
 
 general_accounting_id = '1GhovgewjuCoqJRdN-PrJvXv9Tq9INeKqgBH_s__xi2M'
-def get_range(base_range, spreadsheet_id = general_accounting_id, sheet_title = 'Factures 2016'):
+current_year_sheet_name = 'Factures ' + str(datetime.date.today().year)
+
+def get_range(base_range, spreadsheet_id = general_accounting_id,
+              sheet_title = current_year_sheet_name):
     service = create_sheet_service()
     range_request = "'" + sheet_title + "'!" + base_range
     return(service.spreadsheets().values().get(spreadsheetId = spreadsheet_id, range = range_request).execute())
@@ -87,7 +91,8 @@ def get_range(base_range, spreadsheet_id = general_accounting_id, sheet_title = 
 #OPTIONAL ARGS: spreadsheet id, sheet title (defaults: general accounting, invoice sheet)
 #RETURNS: None
 
-def set_range(base_range, values, spreadsheet_id = general_accounting_id, sheet_title = 'Factures 2016'):
+def set_range(base_range, values, spreadsheet_id = general_accounting_id,
+              sheet_title = current_year_sheet_name):
     service = create_sheet_service()
     range_request = "'" + sheet_title + "'!" + base_range
     request_body = {}

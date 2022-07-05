@@ -222,7 +222,7 @@ active_description_date = get_description_date()
 
 
 
-invoice_number = int(json_load('json/invoice_number.json')) # TODO - validate compare to max of company_dict - project_dict - rate_dict
+invoice_number = int(json_load('json/invoice_number.json'))
 title = active_company.dict['invoice_name'] + '_JM_Facture_' + str(invoice_number)
 date_string = get_date_string() #Defaults to current day - add datetime object as parameter to change
 invo_name = active_project.dict['invoice_name']
@@ -331,15 +331,10 @@ insert_row(general_accounting, new_row)
 
 new_range = 'A' + str(new_row + 1) + ':I' + str(new_row + 1)
 
-dollar_amounts = get_range('E41:E44', spreadsheet_id = new_id, sheet_title = 'sheet1')
-
-base_salary = dollar_to_float(dollar_amounts['values'][0][0])
-
-tax_federal = dollar_to_float(dollar_amounts['values'][1][0])
-
-tax_provincial = dollar_to_float(dollar_amounts['values'][2][0])
-
-total_salary = dollar_to_float(dollar_amounts['values'][3][0])
+base_salary = '=IMPORTRANGE("' + new_id + '";"E41")'
+tax_federal = '=IMPORTRANGE("' + new_id + '";"E42")'
+tax_provincial = '=IMPORTRANGE("' + new_id + '";"E43")'
+total_salary = '=IMPORTRANGE("' + new_id + '";"E44")'
 
 new_values = [[title, date_string, base_salary, tax_federal, tax_provincial, total_salary, '=FAUX', prof_type, invo_code]]
 
@@ -347,8 +342,15 @@ set_range(new_range, new_values)
 
 #download PDF
 
-download_pdf(new_id, '/Users/jimmy/Documents/Factures/' + title)
-download_pdf(general_accounting, '/Users/jimmy/Documents/Bilans/' + str(invoice_number))
+try:
+    download_pdf(new_id, '/Users/jimmy/Documents/Factures/' + title)
+except Exception:
+    print('Failed to download invoice')
+try:
+    download_pdf(general_accounting, '/Users/jimmy/Documents/Bilans/' + str(invoice_number))
+except Exception:
+    print('Failed to download financial data')
+
 
 #increment invoice number ONLY AT END WHEN EVERYTHING HAS WORKED
 active_company.update_invoice_number(invoice_number)

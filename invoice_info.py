@@ -159,21 +159,3 @@ class Rate:
             return("No description available")
         last_description = get_range('C15', spreadsheet_id = invoice_id, sheet_title = 'Sheet1')['values'][0][0]
         return(last_description)
-                                                               
-        
-"""
-# FOLLOWING PROBABLY NOT  NECESSARY - forgot what this was for - commented out for now
-
-company_dict = json_load('json/company_dict.json')
-
-description_dict = {}
-
-unit_dict = {}
-
-invoice_dict = {
-    'invoice_number' : 1000,
-    'company_dict' : company_dict,
-    'description_dict' : description_dict,
-    'unit_dict' : unit_dict
-}
-"""

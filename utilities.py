@@ -185,8 +185,21 @@ def value_changes(spreadsheet_id, change_list, sheet_id = 1875455808):
     for change in change_list:
         value_change(spreadsheet_id, [change], sheet_id)
 
+def get_sheet_id(spreadsheet_id, sheet_name): #returns sheet id corresponding to sheet_name
+    service = create_sheet_service()
+    spreadsheet = service.spreadsheets().get(spreadsheetId=spreadsheet_id).execute()
+    sheet_id = None
+    for _sheet in spreadsheet['sheets']:
+        if _sheet['properties']['title'] == sheet_name:
+            sheet_id = _sheet['properties']['sheetId']
+    if not sheet_id:
+        print('wrong sheet name, fix calling function')
+        raise Exception
+    return sheet_id
+        
 #adds a row to spreadsheet - could be redone with sheet service instance
-def insert_row(spreadsheet_id, row_number = 0, sheet_id = 1691011218):
+def insert_row(spreadsheet_id, row_number = 0):
+    sheet_id = get_sheet_id(spreadsheet_id, 'Factures ' + str(datetime.date.today().year))
     model_request_dict = {
         'insertDimension' :
             {
@@ -194,14 +207,7 @@ def insert_row(spreadsheet_id, row_number = 0, sheet_id = 1691011218):
             'inheritFromBefore' : True 
             }
         }
-
     new_request_dict = model_request_dict
-#    new_request_dict['updateCells']['start']['sheetId'] = sheet_id
-#    new_request_dict['updateCells']['start']['rowIndex'] = change['row'] - 1 #Compensate for zero-index
-#    new_request_dict['updateCells']['start']['columnIndex'] = change['col'] - 1 #Compensate for zero-index
-#    new_request_dict['updateCells']['rows'][0]['values'][0]['userEnteredValue'][change['value_list'][0]] = change['value_list'][1]
-#    new_request_list.append(new_request_dict)
-
     update_spreadsheet(spreadsheet_id, [new_request_dict])
 
 #Get invoice description from invoice number
@@ -214,7 +220,6 @@ def get_description(invoice_number):
     invoice_id = get_file_id('Trio_JM_Facture_1004')
     last_description = get_range('C15', spreadsheet_id = invoice_id, sheet_title = 'Sheet1')['values'][0][0]
     return(last_description)
-
 
 #Returns the month in French from a given int
 def get_month(mois):
@@ -278,12 +283,16 @@ def check_invoice_number(to_print = False):
     invoice_number = int(json_load('json/invoice_number.json'))
 
     last_invoice_row = str(get_final_row())
+    print(last_invoice_row)
 
     #last invoice number from general accounting
     worksheet_invoice_number = int(get_range('A' + last_invoice_row)['values'][0][0][-4:])
 
+    if not invoice_number == worksheet_invoice_number + 1:
+        to_print = True
+    
     if to_print:
         print('google docs last invoice: ' + str(worksheet_invoice_number) + '\n')
-        print('json dict last invoice: ' + str(invoice_number) + '\n')
+        print('json dict next invoice: ' + str(invoice_number) + '\n')
 
     return invoice_number == worksheet_invoice_number + 1
